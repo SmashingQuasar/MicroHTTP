@@ -1,0 +1,9 @@
+{
+    "directories": [
+        "../main/controller/",
+        "../main/model/",
+        "../main/service/",
+        "../main/system/",
+        "../main/tool/"
+    ]
+}
