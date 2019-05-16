@@ -5,7 +5,8 @@ final class System
     static private $AutoloadDirectories = [];
     static private $ViewsDirectory = '../main/views/';
 
-    private function __construct() {}
+    private function __construct()
+    { }
 
     static function autoload($class)
     {
@@ -38,12 +39,16 @@ final class System
         $request = self::buildRequest($process['parameters']);
 
         $controller = new $process['controller']();
-        
+
         $controller->setRequest($request);
 
-        $controller->{$process['action']}();
+        $response = $controller->{$process['action']}();
 
-        $controller->setView(self::$ViewsDirectory. "{$process['controller']}/{$process['view']}");
+        if ($response->getView() === null) {
+            $controller->setView(self::$ViewsDirectory . "{$process['controller']}/{$process['view']}");
+        } else {
+            $controller->setView($response->getView());
+        }
 
         $controller->render();
     }
@@ -53,7 +58,7 @@ final class System
         $URI = $_SERVER['REQUEST_URI'];
 
         $URI = explode('?', $URI);
-        
+
         $URI = array_filter($URI);
         $URI = array_values($URI);
 
@@ -64,13 +69,12 @@ final class System
         $URI = array_values($URI);
 
         if (empty($URI)) {
-            $controller = 'Home';
+            $controller = 'Base';
             $view = 'default';
             $action = $view;
             $view .= '.php';
             $parameters = [];
         } else {
-            
             $controller = ucfirst(array_shift($URI));
             $view = array_shift($URI);
 
@@ -82,7 +86,7 @@ final class System
             $view .= '.php';
             $parameters = $URI ?? [];
         }
-        
+
         return [
             'controller' => $controller,
             'action' => $action,
